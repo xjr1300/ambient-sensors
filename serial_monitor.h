@@ -31,7 +31,7 @@ public:
     //  temp: 温度。
     //  hum: 湿度。
     //  ill: 照度。
-    void print(float temp, float hum, float ill) {
+    void print_measured_values(float temp, float hum, float ill) {
         dtostrf(temp, -1, 1, this->_temp);
         dtostrf(hum, -1, 1, this->_hum);
         dtostrf(ill, -1, 0, this->_ill);

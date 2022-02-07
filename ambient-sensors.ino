@@ -27,15 +27,16 @@ TempHumSensor temp_hum_sensor(SI7021_ADDRESS);
 // 照度センサー
 IlluminanceSensor ill_sensor;
 
-void setup() {
+void setup(void) {
+  // I2Cの利用を開始
+  Wire.begin();
+
   // シリアルモニタを初期化
   monitor.init();
   // LCDディスプレイを初期化
   lcd.init(7, 8, 9, 10, 11, 12);
   // LEDをの初期化
   led.init();
-  // I2Cの利用を開始
-  Wire.begin();
   // 温湿度センサーを初期化
   temp_hum_sensor.init();
   Serial.println("[INFO] Temp & hum sensor was initialized.");
@@ -52,18 +53,19 @@ void setup() {
   delay(1000);
 }
 
-void loop() {
-  // 温湿度。
+void loop(void) {
+  // 温湿度値
   float temp, hum;
-  // 照度。
+  // 照度値
   bool r_ill; float ill;
-  // 温度と湿度を計測
+
+  // 温度と湿度を測定
   temp = temp_hum_sensor.measure_temp();
   hum = temp_hum_sensor.measure_hum();
-  // 照度を計測
+  // 照度を測定
   r_ill = ill_sensor.measure(&ill); 
   // 測定値を出力
-  monitor.print(temp, hum, ill);
+  monitor.print_measured_values(temp, hum, ill);
   lcd.print_measured_values(temp, hum, ill);
   // LEDを点灯または消灯
   led.on_off();

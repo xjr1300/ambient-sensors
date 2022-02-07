@@ -1,6 +1,7 @@
 {
-    "cSpell.words": [
-        "dtostrf",
-        "psalsval"
-    ]
+  "cSpell.words": ["dtostrf", "psalsval"],
+  "files.associations": {
+    "__locale": "cpp",
+    "locale": "cpp"
+  }
 }

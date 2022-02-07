@@ -13,7 +13,7 @@ public:
     LcdDisplay(void) {}
 
     // デストラクタ
-    ~LcdDisplay() {
+    ~LcdDisplay(void) {
         delete this->_lcd;
     }
 
