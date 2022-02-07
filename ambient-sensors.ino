@@ -8,9 +8,9 @@
 
 // LEDピン
 const int LED_PIN = 5;
-const int MAX_LED_VALUE = 200;
-const int LED_DELAY = 40;
-const int LED_STEP = 10;
+const int MAX_LED_VALUE = 150;
+const int LED_DELAY = 100;
+const int LED_STEP = 15;
 
 // Si7021センサーインスタンス
 Weather sensor;
