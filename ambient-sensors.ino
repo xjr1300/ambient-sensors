@@ -3,14 +3,17 @@
 #include "SparkFun_Si7021_Breakout_Library.h"
 #include "RPR-0521RS.h"
 
+#include "led.h"
+
 // Si7021スレーブアドレス
 #define SI7021_ADDRESS 0x40
 
-// LEDピン
+// LED
 const int LED_PIN = 5;
-const int MAX_LED_VALUE = 150;
-const int LED_DELAY = 100;
-const int LED_STEP = 15;
+const int MAX_LED_VALUE = 100;
+const int LED_DELAY = 200;
+const int LED_STEP = 10;
+SwitchingLed led(LED_PIN, MAX_LED_VALUE, LED_STEP, LED_DELAY);
 
 // Si7021センサーインスタンス
 Weather sensor;
@@ -26,6 +29,7 @@ LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
 // LCDに出力する文字列を記憶するバッファ
 char lcdBuf[24];
+
 
 // 温度湿度構造体
 struct TempHum {
@@ -96,26 +100,9 @@ void printMeasuredValuesToLcd(TempHum *pTempHum, float *pAlsValue) {
   printLcd(1, lcdBuf);
 }
 
-void led() {
-  int i = 0;
-  while (i < MAX_LED_VALUE) {
-    analogWrite(LED_PIN, i);
-    delay(LED_DELAY);
-    i += LED_STEP;
-  }
-  delay(100);
-  i = MAX_LED_VALUE;
-  while (0 <= i) {
-    analogWrite(LED_PIN, i);
-    delay(LED_DELAY);
-    i -= LED_STEP;
-  }
-  delay(100);
-}
-
 void setup() {
-  // LEDピンの設定
-  pinMode(LED_PIN, OUTPUT);
+  // LEDの初期化
+  led.init();
 
   // LCDディスプレイの準備
   lcd.begin(16, 2);
@@ -178,6 +165,6 @@ void loop() {
     printMeasuredValuesToSerial(&tempHum, &alsValue);
   }
 
-  led();
-  // delay(1000);
+  // LEDを点灯または消灯
+  led.on_off();
 }
