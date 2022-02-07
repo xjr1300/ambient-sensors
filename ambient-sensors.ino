@@ -1,10 +1,10 @@
 #include <Wire.h>
-#include <LiquidCrystal.h>
 #include "SparkFun_Si7021_Breakout_Library.h"
 #include "RPR-0521RS.h"
 
 #include "led.h"
 #include "serial_monitor.h"
+#include "lcd_display.h"
 
 // Si7021スレーブアドレス
 #define SI7021_ADDRESS 0x40
@@ -16,24 +16,18 @@ const int LED_DELAY = 200;
 const int LED_STEP = 10;
 SwitchingLed led(LED_PIN, MAX_LED_VALUE, LED_STEP, LED_DELAY);
 
+// シリアルモニター
+#define SERIAL_BOARATE 9600
+SerialMonitor monitor(SERIAL_BOARATE);
+
+// LCDディスプレイ
+LcdDisplay lcd;
+
 // Si7021センサーインスタンス
-char tempBuf[16];
-char humBuf[16];
-char alsBuf[32];
 Weather sensor;
 
 // RPR0521RSセンサーインスタンス
 RPR0521RS rpr0521rs;
-
-// LCDディスプリインスタンスの構築とピン設定
-LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
-
-// LCDに出力する文字列を記憶するバッファ
-char lcdBuf[24];
-
-// シリアルモニター
-#define SERIAL_BOARATE 9600
-SerialMonitor monitor(SERIAL_BOARATE);
 
 // 温度湿度構造体
 struct TempHum {
@@ -63,55 +57,24 @@ void getTempHum(TempHum *pTempHum) {
   pTempHum->hum = sensor.getRH();
 }
 
-// LCDディスプレイに文字列を表示する。
-//
-// Arguments:
-//  row: 文字列を表示する行番号。
-//  pBuf: 表示する文字列の先頭ポインタ。
-void printLcd(int row, const char *pBuf) {
-  lcd.setCursor(0, row);
-  lcd.print(pBuf);
-}
-
-// 測定した値をLCDディスプレイに表示する。
-//
-// Arguments:
-//  pTempHum: 温度と湿度を記録した構造体のポインタ。
-//  pAlsValue: 照度を記録した変数のポインタ。
-void printMeasuredValuesToLcd(TempHum *pTempHum, float *pAlsValue) {
-  lcd.clear();
-  // 温度と湿度
-  dtostrf(pTempHum->temp, -1, 1, tempBuf);
-  dtostrf(pTempHum->hum, -1, 1, humBuf);
-  sprintf(lcdBuf, "%s[C] %s[%%]", tempBuf, humBuf);
-  printLcd(0, lcdBuf);
-  // 照度
-  dtostrf(*pAlsValue, -1, 0, alsBuf);
-  sprintf(lcdBuf, "%s[lx]", alsBuf);
-  printLcd(1, lcdBuf);
-}
-
 void setup() {
   // LEDをの初期化
   led.init();
   // シリアルモニタを初期化
   monitor.init();
+  // LCDディスプレイを初期化
+  lcd.init(7, 8, 9, 10, 11, 12);
 
-  // LCDディスプレイの準備
-  lcd.begin(16, 2);
-  lcd.clear();
-  printLcd(0, "Initializing...");
-  
   // I2Cの利用を開始
   Wire.begin();
-  printLcd(0, "I2C init.");
+  lcd.print_row(0, "I2C init.");
   Serial.println("[INFO] I2C was initialized.");
 
   // Si7021をリセット
   Wire.beginTransmission(SI7021_ADDRESS);
   Wire.write(0xFE); // リセットコマンドアドレス
   Wire.endTransmission();
-  printLcd(0, "Si7021 init.");
+  lcd.print_row(0, "Si7021 init.");
   Serial.println("[INFO] Si7021 was initialized.");
   delay(15);
 
@@ -122,7 +85,7 @@ void setup() {
     Serial.println("[ERROR] Fail - Si7021 was not detected.");
     return;
   }
-  printLcd(0, "Si7021 detected.");
+  lcd.print_row(0, "Si7021 detected.");
 
   // RPR-0521RSを初期化
   if (rpr0521rs.init() == 0) {
@@ -131,8 +94,8 @@ void setup() {
     Serial.println("[ERROR] Fail - RPR0521RS could not initialized.");
     return;
   }
-  printLcd(0, "RPR-0521RS init.");
-  printLcd(0, "Start measuring...");
+  lcd.print_row(0, "RPR-0521RS init.");
+  lcd.print_row(0, "Start measuring...");
   delay(1000);
 }
 
@@ -147,8 +110,8 @@ void loop() {
   bool isPrintSerial = rpr0521rs.get_psalsval(&psValue, &alsValue) == 0;
   // 測定値を出力
   if (isPrintSerial) {
-    printMeasuredValuesToLcd(&tempHum, &alsValue);
     monitor.print(tempHum.temp, tempHum.hum, alsValue);
+    lcd.print_measured_values(tempHum.temp, tempHum.hum, alsValue);
   }
 
   // LEDを点灯または消灯
