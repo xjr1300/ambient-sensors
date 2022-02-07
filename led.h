@@ -69,7 +69,6 @@ public:
         this->switching_values(&current_value, &end_value, &step);
         while (!this->is_break_loop(current_value, end_value)) {
             analogWrite(this->_pin, current_value);
-            Serial.println(current_value);
             current_value += step;
             delay(this->_delay);
         }
