@@ -1,4 +1,5 @@
 #include <Wire.h>
+
 #include "serial_monitor.h"
 #include "lcd_display.h"
 #include "led.h"
@@ -29,21 +30,16 @@ IlluminanceSensor ill_sensor;
 void setup() {
   // シリアルモニタを初期化
   monitor.init();
-
   // LCDディスプレイを初期化
   lcd.init(7, 8, 9, 10, 11, 12);
-
   // LEDをの初期化
   led.init();
-
   // I2Cの利用を開始
   Wire.begin();
-
   // 温湿度センサーを初期化
   temp_hum_sensor.init();
   Serial.println("[INFO] Temp & hum sensor was initialized.");
   lcd.print_row(0, "Temp-Hum init.");
-
   // 照度センサーを初期化
   if (!ill_sensor.init()) {
     Serial.println("[ERROR] Illuminance sensor could not initialized.");
@@ -53,7 +49,7 @@ void setup() {
 
   // 測定を開始
   lcd.print_row(0, "Start measuring...");
-  delay(3000);
+  delay(1000);
 }
 
 void loop() {
@@ -61,7 +57,6 @@ void loop() {
   float temp, hum;
   // 照度。
   bool r_ill; float ill;
-
   // 温度と湿度を計測
   temp = temp_hum_sensor.measure_temp();
   hum = temp_hum_sensor.measure_hum();
@@ -70,7 +65,6 @@ void loop() {
   // 測定値を出力
   monitor.print(temp, hum, ill);
   lcd.print_measured_values(temp, hum, ill);
-
   // LEDを点灯または消灯
   led.on_off();
 }
