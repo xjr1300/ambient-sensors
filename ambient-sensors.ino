@@ -6,6 +6,12 @@
 // Si7021スレーブアドレス
 #define SI7021_ADDRESS 0x40
 
+// LEDピン
+const int LED_PIN = 5;
+const int MAX_LED_VALUE = 200;
+const int LED_DELAY = 40;
+const int LED_STEP = 10;
+
 // Si7021センサーインスタンス
 Weather sensor;
 
@@ -90,7 +96,27 @@ void printMeasuredValuesToLcd(TempHum *pTempHum, float *pAlsValue) {
   printLcd(1, lcdBuf);
 }
 
+void led() {
+  int i = 0;
+  while (i < MAX_LED_VALUE) {
+    analogWrite(LED_PIN, i);
+    delay(LED_DELAY);
+    i += LED_STEP;
+  }
+  delay(100);
+  i = MAX_LED_VALUE;
+  while (0 <= i) {
+    analogWrite(LED_PIN, i);
+    delay(LED_DELAY);
+    i -= LED_STEP;
+  }
+  delay(100);
+}
+
 void setup() {
+  // LEDピンの設定
+  pinMode(LED_PIN, OUTPUT);
+
   // LCDディスプレイの準備
   lcd.begin(16, 2);
   lcd.clear();
@@ -152,5 +178,6 @@ void loop() {
     printMeasuredValuesToSerial(&tempHum, &alsValue);
   }
 
-  delay(1000);
+  led();
+  // delay(1000);
 }
