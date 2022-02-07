@@ -5,6 +5,7 @@
 #include "led.h"
 #include "serial_monitor.h"
 #include "lcd_display.h"
+#include "illuminance_sensor.h"
 
 // Si7021スレーブアドレス
 #define SI7021_ADDRESS 0x40
@@ -26,8 +27,8 @@ LcdDisplay lcd;
 // Si7021センサーインスタンス
 Weather sensor;
 
-// RPR0521RSセンサーインスタンス
-RPR0521RS rpr0521rs;
+// 照度センサー
+IlluminanceSensor ill_sensor;
 
 // 温度湿度構造体
 struct TempHum {
@@ -36,17 +37,16 @@ struct TempHum {
   // 湿度(%)
   float hum;
 };
-
-// 華氏の温度を摂氏に変換する。
-//
-// Arguments:
-//  f: 華氏。
-//
-// Returns:
-//  摂氏。
-float f_to_c(float f) {
-  return (f - 32.0) / 1.8;
-}
+    // 華氏の温度を摂氏に変換する。
+    //
+    // Arguments:
+    //  f: 華氏。
+    //
+    // Returns:
+    //  摂氏。
+    float f_to_c(float f) {
+      return (f - 32.0) / 1.8;
+    }
 
 // Si7021で温度と湿度を計測した値を返却する。
 //
@@ -80,39 +80,42 @@ void setup() {
 
   // Si7021センサーの存在を確認
   if (sensor.begin()) {
-    Serial.println("[INFO] Success - Si7021 was detected.");
+    Serial.println("[INFO] Si7021 was detected.");
+    lcd.print_row(0, "Si7021 detected.");
   } else {
-    Serial.println("[ERROR] Fail - Si7021 was not detected.");
+    Serial.println("[ERROR] Si7021 was not detected.");
+    lcd.print_row(0, "Si7021 fail.");
     return;
   }
-  lcd.print_row(0, "Si7021 detected.");
 
-  // RPR-0521RSを初期化
-  if (rpr0521rs.init() == 0) {
-    Serial.println("[INFO] RPR0521RS was initialized.");
+  // 照度センサーを初期化
+  if (ill_sensor.init()) {
+    Serial.println("[INFO] Illuminance sensor was initialized.");
+    lcd.print_row(0, "RPR-0521RS init.");
   } else {
-    Serial.println("[ERROR] Fail - RPR0521RS could not initialized.");
+    Serial.println("[ERROR] Illuminance sensor could not initialized.");
+    lcd.print_row(0, "Ill sensor fail.");
     return;
   }
-  lcd.print_row(0, "RPR-0521RS init.");
+
+  // 測定を開始
   lcd.print_row(0, "Start measuring...");
-  delay(1000);
+  delay(500);
 }
 
 void loop() {
   // 測定値
   TempHum tempHum;
-  unsigned short psValue; // PS: RPR-0521RS近接センサ
-  float alsValue;         // ALS: Ambient light sensor(環境光センサー)
+  // 照度。
+  bool r_ill; float ill;
+
   // 温度と湿度を計測
   getTempHum(&tempHum);
   // 照度を計測
-  bool isPrintSerial = rpr0521rs.get_psalsval(&psValue, &alsValue) == 0;
+  r_ill = ill_sensor.measure(&ill); 
   // 測定値を出力
-  if (isPrintSerial) {
-    monitor.print(tempHum.temp, tempHum.hum, alsValue);
-    lcd.print_measured_values(tempHum.temp, tempHum.hum, alsValue);
-  }
+  monitor.print(tempHum.temp, tempHum.hum, ill);
+  lcd.print_measured_values(tempHum.temp, tempHum.hum, ill);
 
   // LEDを点灯または消灯
   led.on_off();
