@@ -4,6 +4,7 @@
 #include "RPR-0521RS.h"
 
 #include "led.h"
+#include "serial_monitor.h"
 
 // Si7021スレーブアドレス
 #define SI7021_ADDRESS 0x40
@@ -16,13 +17,13 @@ const int LED_STEP = 10;
 SwitchingLed led(LED_PIN, MAX_LED_VALUE, LED_STEP, LED_DELAY);
 
 // Si7021センサーインスタンス
+char tempBuf[16];
+char humBuf[16];
+char alsBuf[32];
 Weather sensor;
 
 // RPR0521RSセンサーインスタンス
 RPR0521RS rpr0521rs;
-
-// シリアルモニタに測定値を表示するときに使用するバッファ
-char serialBuff[128], tempBuf[16], humBuf[16], alsBuf[32];
 
 // LCDディスプリインスタンスの構築とピン設定
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
@@ -30,6 +31,9 @@ LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 // LCDに出力する文字列を記憶するバッファ
 char lcdBuf[24];
 
+// シリアルモニター
+#define SERIAL_BOARATE 9600
+SerialMonitor monitor(SERIAL_BOARATE);
 
 // 温度湿度構造体
 struct TempHum {
@@ -57,19 +61,6 @@ float f_to_c(float f) {
 void getTempHum(TempHum *pTempHum) {
   pTempHum->temp = f_to_c(sensor.getTempF());
   pTempHum->hum = sensor.getRH();
-}
-
-// 測定した値をシリアルモニタに表示する。
-//
-// Arguments:
-//  pTempHum: 温度と湿度を記録した構造体のポインタ。
-//  pAlsValue: 照度を記録した変数のポインタ。
-void printMeasuredValuesToSerial(TempHum *pTempHum, float *pAlsValue) {
-  dtostrf(pTempHum->temp, -1, 1, tempBuf);
-  dtostrf(pTempHum->hum, -1, 1, humBuf);
-  dtostrf(*pAlsValue, -1, 0, alsBuf);
-  sprintf(serialBuff, "Temp: %s[C], Hum: %s[%%], ALS: %s[lx]", tempBuf, humBuf, alsBuf);
-  Serial.println(serialBuff);
 }
 
 // LCDディスプレイに文字列を表示する。
@@ -101,21 +92,16 @@ void printMeasuredValuesToLcd(TempHum *pTempHum, float *pAlsValue) {
 }
 
 void setup() {
-  // LEDの初期化
+  // LEDをの初期化
   led.init();
+  // シリアルモニタを初期化
+  monitor.init();
 
   // LCDディスプレイの準備
   lcd.begin(16, 2);
   lcd.clear();
   printLcd(0, "Initializing...");
-
-  // シリアルモニタの利用を開始
-  Serial.begin(9600);
-  // シリアルモニタが準備できるまでループ
-  while (!Serial) {}
-  printLcd(0, "Serial init.");
-  Serial.println("[INFO] Initializing.");
-
+  
   // I2Cの利用を開始
   Wire.begin();
   printLcd(0, "I2C init.");
@@ -162,7 +148,7 @@ void loop() {
   // 測定値を出力
   if (isPrintSerial) {
     printMeasuredValuesToLcd(&tempHum, &alsValue);
-    printMeasuredValuesToSerial(&tempHum, &alsValue);
+    monitor.print(tempHum.temp, tempHum.hum, alsValue);
   }
 
   // LEDを点灯または消灯
