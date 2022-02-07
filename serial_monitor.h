@@ -3,10 +3,10 @@ private:
     // ボーレート
     int _boarate;
     // シリアルモニタに測定値を表示するときに使用するバッファ
-    char serial[128], temp[16], hum[16], ill[32];
+    char _serial[128], _temp[16], _hum[16], _ill[32];
 
     // デフォルトコンストラクタ。
-    SerialMonitor() { }
+    SerialMonitor(void) { }
 
 public:
     // コンストラクタ
@@ -18,7 +18,7 @@ public:
     }
     
     // 初期化する。
-    void init() {
+    void init(void) {
         Serial.begin(9600);
         // シリアルモニタが準備できるまでループ
         while (!Serial) {}
@@ -32,10 +32,10 @@ public:
     //  hum: 湿度。
     //  ill: 照度。
     void print(float temp, float hum, float ill) {
-        dtostrf(temp, -1, 1, this->temp);
-        dtostrf(hum, -1, 1, this->hum);
-        dtostrf(ill, -1, 0, this->ill);
-        sprintf(serial, "Temp: %s[C], Hum: %s[%%], ALS: %s[lx]", this->temp, this->hum, this->ill);
-        Serial.println(serial);
+        dtostrf(temp, -1, 1, this->_temp);
+        dtostrf(hum, -1, 1, this->_hum);
+        dtostrf(ill, -1, 0, this->_ill);
+        sprintf(this->_serial, "Temp: %s[C], Hum: %s[%%], ALS: %s[lx]", this->_temp, this->_hum, this->_ill);
+        Serial.println(_serial);
     }
 };
