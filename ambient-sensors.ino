@@ -8,10 +8,10 @@
 
 // シリアルモニター
 #define SERIAL_BOARATE 9600
-SerialMonitor monitor(SERIAL_BOARATE);
+SerialMonitor serial_monitor(SERIAL_BOARATE);
 
 // LCDディスプレイ
-LcdDisplay lcd;
+LcdDisplay lcd_display;
 
 // LED
 const int LED_PIN = 5;
@@ -32,24 +32,24 @@ void setup(void) {
   Wire.begin();
 
   // シリアルモニタを初期化
-  monitor.init();
-  // LCDディスプレイを初期化
-  lcd.init(7, 8, 9, 10, 11, 12);
+  serial_monitor.init();
+  // lcd_displayディスプレイを初期化
+  lcd_display.init(7, 8, 9, 10, 11, 12);
   // LEDをの初期化
   led.init();
   // 温湿度センサーを初期化
   temp_hum_sensor.init();
   Serial.println("[INFO] Temp & hum sensor was initialized.");
-  lcd.print_row(0, "Temp-Hum init.");
+  lcd_display.print_row(0, "Temp-Hum init.");
   // 照度センサーを初期化
   if (!ill_sensor.init()) {
     Serial.println("[ERROR] Illuminance sensor could not initialized.");
-    lcd.print_row(0, "Ill sensor fail.");
+    lcd_display.print_row(0, "Ill sensor fail.");
     return;
   }
 
   // 測定を開始
-  lcd.print_row(0, "Start measuring...");
+  lcd_display.print_row(0, "Start measuring...");
   delay(1000);
 }
 
@@ -65,8 +65,8 @@ void loop(void) {
   // 照度を測定
   r_ill = ill_sensor.measure(&ill); 
   // 測定値を出力
-  monitor.print_measured_values(temp, hum, ill);
-  lcd.print_measured_values(temp, hum, ill);
+  serial_monitor.print_measured_values(temp, hum, ill);
+  lcd_display.print_measured_values(temp, hum, ill);
   // LEDを点灯または消灯
   led.on_off();
 }
