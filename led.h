@@ -1,5 +1,5 @@
 class SwitchingLed {
-private:
+   private:
     // ピン番号。
     int _pin;
     // LEDを点灯するときの最大値。
@@ -41,7 +41,7 @@ private:
         return false;
     }
 
-public:
+   public:
     // コンストラクタ
     //
     // Arguments:
