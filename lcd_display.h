@@ -5,14 +5,14 @@ class LcdDisplay {
     // LCDディスプレイポインタ
     LiquidCrystal* _lcd;
     // LCDに描画する文字列を作成するバッファ
-    char _buf[24], _temp[16], _hum[16], _ill[16], _moist[16];
-    // 照度表示フラグ
-    bool _is_ill;
+    char _buf[24], _temp[16], _hum[16], _als[16], _moist[16];
+    // 環境光照度表示フラグ
+    bool _is_als;
 
    public:
     // デフォルトコンストラクタ
     //
-    LcdDisplay(void) { this->_is_ill = true; }
+    LcdDisplay(void) { this->_is_als = true; }
 
     // デストラクタ
     ~LcdDisplay(void) { delete this->_lcd; }
@@ -46,9 +46,10 @@ class LcdDisplay {
     // Arguments:
     //  temp: 温度。
     //  hum: 湿度。
-    //  ill: 照度。
+    //  als: 照度。
     //  moist: 土壌水分量。
-    void print_measured_values(float temp, float hum, float ill) {
+    void print_measured_values(float temp, float hum, float als,
+                               int32_t moist) {
         this->_lcd->clear();
         // 温度と湿度
         dtostrf(temp, -1, 1, this->_temp);
@@ -56,9 +57,9 @@ class LcdDisplay {
         sprintf(this->_buf, "%s[C] %s[%%]", this->_temp, this->_hum);
         this->print_row(0, this->_buf);
         // 照度または土壌水分量
-        if (this->_is_ill) {
-            dtostrf(ill, -1, 0, this->_ill);
-            sprintf(this->_buf, "ALS: %s[lx]", this->_ill);
+        if (this->_is_als) {
+            dtostrf(als, -1, 0, this->_als);
+            sprintf(this->_buf, "ALS: %s[lx]", this->_als);
         } else {
             if (0 <= moist) {
                 sprintf(this->_moist, "%d", moist);
@@ -69,6 +70,6 @@ class LcdDisplay {
         }
         this->print_row(1, this->_buf);
         // 切り替え
-        this->_is_ill = !this->_is_ill;
+        this->_is_als = !this->_is_als;
     }
 };

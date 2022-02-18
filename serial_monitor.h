@@ -3,7 +3,7 @@ class SerialMonitor {
     // ボーレート
     int _boarate;
     // シリアルモニタに測定値を表示するときに使用するバッファ
-    char _serial[128], _temp[16], _hum[16], _ill[32], _moist[32];
+    char _serial[128], _temp[16], _hum[16], _als[32], _moist[32];
 
     // デフォルトコンストラクタ。
     SerialMonitor(void) {}
@@ -25,18 +25,18 @@ class SerialMonitor {
         Serial.println("[INFO] Serial monitor was initialized.");
     }
 
-    // 温度、湿度及び照度を出力する。
+    // 測定値をシリアルモニタに出力する。
     //
     // Arguments:
     //  temp: 温度。
     //  hum: 湿度。
-    //  ill: 照度。
+    //  als: 環境光照度。
     //  moist: 土壌水分量。
-    void print_measured_values(float temp, float hum, float ill,
+    void print_measured_values(float temp, float hum, float als,
                                int32_t moist) {
         dtostrf(temp, -1, 1, this->_temp);
         dtostrf(hum, -1, 1, this->_hum);
-        dtostrf(ill, -1, 0, this->_ill);
+        dtostrf(als, -1, 0, this->_als);
         if (0 <= moist) {
             sprintf(this->_moist, "%d", moist);
         } else {
@@ -44,7 +44,7 @@ class SerialMonitor {
         }
         sprintf(this->_serial,
                 "Temp: %s[C], Hum: %s[%%], ALS: %s[lx], Moist: %d", this->_temp,
-                this->_hum, this->_ill, this->_moist);
+                this->_hum, this->_als, this->_moist);
         Serial.println(_serial);
     }
 };

@@ -1,32 +1,45 @@
 #include <Wire.h>
 
-#define COMMAND_LED_OFF 0x00
-#define COMMAND_LED_ON 0x01
-#define COMMAND_GET_VALUE 0x05
-#define COMMAND_NOTHING_NEW 0x99
+const byte COMMAND_LED_OFF = 0x00;
+const byte COMMAND_LED_ON = 0x01;
+const byte COMMAND_GET_VALUE = 0x05;
+const byte COMMAND_NOTHING_NEW = 0x99;
 
 // センサーのデフォルトのI2Cアドレス
 const byte ADDRESS = 0x28;
 
 /// Sparkfun Qwiic土壌水分センサー
 class SoilMoistureSensor {
-   public:
+   private:
+    // センサーからの応答を取得する試行回数。
+    int _times;
+    // センサーから応答の取得する間隔ミリ秒
+    int _interval;
+
     // デフォルトコンストラクタ
-    void SoilMoistureSensor(void) {}
+    SoilMoistureSensor(void) {}
+
+   public:
+    // コンストラクタ
+    // Arguments:
+    //  times: センサーからの応答を取得する試行回数。
+    //  interval: センサーから応答の取得する間隔ミリ秒
+    SoilMoistureSensor(int times, int interval) {
+        this->_times = times;
+        this->_interval = interval;
+    }
 
     // 初期化する。
-    // Arguments:
-    //  times: センサーが接続されているか確認する回数。
-    //  interval: センサーが接続されているか確認する間隔秒数。
+    //
     // Returns:
     //  センサーが接続されていることを確認できた場合はtrue。確認できなかった場合はfalse。
-    bool init(int times, int interval) {
-        for (int i = 0; i < times; ++i) {
+    bool init(void) {
+        for (int i = 0; i < this->_times; ++i) {
             Wire.beginTransmission(ADDRESS);
             if (Wire.endTransmission() == 0) {
                 return true;
             }
-            delay(interval);
+            delay(this->_interval);
         }
         return false;
     }
@@ -42,10 +55,10 @@ class SoilMoistureSensor {
         Wire.endTransmission();
 
         // 測定値を送信する命令を発効
-        Wire.requestFrom(ADDRESS, 2);
+        Wire.requestFrom(ADDRESS, (uint8_t)0x02);
 
         // 送信された測定値を読み込み
-        for (int i = 0; i < times; ++i) {
+        for (int i = 0; i < this->_times; ++i) {
             while (Wire.available()) {
                 uint8_t adc_value_l = Wire.read();
                 uint8_t adc_value_h = Wire.read();
@@ -54,7 +67,8 @@ class SoilMoistureSensor {
                 adc_value |= adc_value_l;
                 return (int32_t)adc_value;
             }
+            delay(this->_interval);
         }
         return ~(int32_t)0;
     }
-}
+};

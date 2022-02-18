@@ -2,7 +2,9 @@
   "cSpell.words": ["dtostrf", "psalsval", "Qwiic"],
   "files.associations": {
     "__locale": "cpp",
-    "locale": "cpp"
+    "locale": "cpp",
+    "__memory": "cpp",
+    "optional": "cpp"
   },
   "C_Cpp.clang_format_style": "{ BasedOnStyle: Google, IndentWidth: 4 }",
   "editor.formatOnSave": true,

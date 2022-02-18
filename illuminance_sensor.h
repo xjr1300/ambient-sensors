@@ -19,11 +19,11 @@ class IlluminanceSensor {
     // 照度を測定する。
     //
     // Arguments:
-    //  ill: 測定した照度。単位はlux。
+    //  als: 測定した照度。単位はlux。
     //
     // Returns:
     //  測定に成功した場合はtrue。測定に失敗した場合はfalse。
-    bool measure(float* ill) {
-        return this->_sensor.get_psalsval(&this->_ps, ill) == 0;
+    bool measure(float* als) {
+        return this->_sensor.get_psalsval(&this->_ps, als) == 0;
     }
 };

@@ -29,7 +29,7 @@ TempHumSensor temp_hum_sensor(SI7021_ADDRESS);
 IlluminanceSensor ill_sensor;
 
 // 土壌水分センサー
-SoilMoistureSensor moist_sensor;
+SoilMoistureSensor moist_sensor(10, 10);
 
 void setup(void) {
     // I2Cの利用を開始
@@ -45,7 +45,7 @@ void setup(void) {
     temp_hum_sensor.init();
     Serial.println("[INFO] Temp & hum sensor was initialized.");
     lcd_display.print_row(0, "Temp-Hum init.");
-    // 照度センサーを初期化
+    // 環境光照度センサーを初期化
     if (!ill_sensor.init()) {
         Serial.println("[ERROR] Illuminance sensor could not initialized.");
         lcd_display.print_row(0, "Ill sensor err.");
@@ -58,7 +58,7 @@ void setup(void) {
         Serial.println("[ERROR] Soil moisture sensor could not initialized.");
         lcd_display.print_row(0, "Soil sensor err.");
         return;
-    })
+    }
     Serial.println("[INFO] Soil moisture sensor was initialized.");
     lcd_display.print_row(0, "Soil sensor init.");
 
@@ -70,23 +70,24 @@ void setup(void) {
 void loop(void) {
     // 温湿度値
     float temp, hum;
-    // 照度値
-    bool r_ill;
-    float ill;
+    // 環境光照度値
+    bool r_als;
+    float als;
     // 土壌水分量
     int32_t moist;
 
     // 温度と湿度を測定
     temp = temp_hum_sensor.measure_temp();
     hum = temp_hum_sensor.measure_hum();
-    // 照度を測定
-    r_ill = ill_sensor.measure(&ill);
+    // 環境光照度を測定
+    r_als = ill_sensor.measure(&als);
     // 土壌水分量を測定
     moist = moist_sensor.measure();
 
     // 測定値を出力
-    serial_monitor.print_measured_values(temp, hum, ill);
-    lcd_display.print_measured_values(temp, hum, ill);
+    serial_monitor.print_measured_values(temp, hum, als, moist);
+    lcd_display.print_measured_values(temp, hum, als, moist);
+
     // LEDを点灯または消灯
     led.on_off();
 }
