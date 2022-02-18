@@ -1,7 +1,10 @@
 {
-  "cSpell.words": ["dtostrf", "psalsval"],
+  "cSpell.words": ["dtostrf", "psalsval", "Qwiic"],
   "files.associations": {
     "__locale": "cpp",
     "locale": "cpp"
-  }
+  },
+  "C_Cpp.clang_format_style": "{ BasedOnStyle: Google, IndentWidth: 4 }",
+  "editor.formatOnSave": true,
+  "editor.formatOnType": true
 }
