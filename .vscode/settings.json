@@ -4,7 +4,8 @@
     "__locale": "cpp",
     "locale": "cpp",
     "__memory": "cpp",
-    "optional": "cpp"
+    "optional": "cpp",
+    "ios": "cpp"
   },
   "C_Cpp.clang_format_style": "{ BasedOnStyle: Google, IndentWidth: 4 }",
   "editor.formatOnSave": true,

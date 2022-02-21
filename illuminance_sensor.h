@@ -14,7 +14,7 @@ class IlluminanceSensor {
     //
     // Returns:
     //  初期化に成功した場合はtrue。初期化に失敗した場合はfalse。
-    bool init() { return this->_sensor.init(); }
+    bool init() { return !this->_sensor.init(); }
 
     // 照度を測定する。
     //
