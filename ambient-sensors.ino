@@ -16,9 +16,9 @@ LcdDisplay lcd_display;
 
 // LED
 const int LED_PIN = 5;
-const int MAX_LED_VALUE = 100;
+const int MAX_LED_VALUE = 80;
 const int LED_DELAY = 200;
-const int LED_STEP = 10;
+const int LED_STEP = 8;
 SwitchingLed led(LED_PIN, MAX_LED_VALUE, LED_STEP, LED_DELAY);
 
 // 温湿度センサー
