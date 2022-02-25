@@ -5,7 +5,7 @@ class LcdDisplay {
     // LCDディスプレイポインタ
     LiquidCrystal* _lcd;
     // LCDに描画する文字列を作成するバッファ
-    char _buf[24], _temp[16], _hum[16], _als[16], _moist[16];
+    char _buf[17], _temp[9], _hum[9], _als[17], _moist[17];
     // 環境光照度表示フラグ
     bool _is_als;
 
@@ -25,7 +25,7 @@ class LcdDisplay {
     //  d5: LCDのD5ピンに接続するArduino側のピン番号
     //  d6: LCDのD6ピンに接続するArduino側のピン番号
     //  d7: LCDのD7ピンに接続するArduino側のピン番号
-    void init(int rs, int enable, int d4, int d5, int d6, int d7) {
+    void init(byte rs, byte enable, byte d4, byte d5, byte d6, byte d7) {
         this->_lcd = new LiquidCrystal(rs, enable, d4, d5, d6, d7);
         this->_lcd->begin(16, 2);
         this->_lcd->clear();
@@ -36,7 +36,7 @@ class LcdDisplay {
     // Arguments:
     //  row: 文字列を表示する行番号。
     //  pBuf: 表示する文字列の先頭ポインタ。
-    void print_row(int row, const char* buf) {
+    void print_row(byte row, const char* buf) {
         this->_lcd->setCursor(0, row);
         this->_lcd->print(buf);
     }
@@ -49,24 +49,24 @@ class LcdDisplay {
     //  als: 照度。
     //  moist: 土壌水分量。
     void print_measured_values(float temp, float hum, float als,
-                               int32_t moist) {
+                               int16_t moist) {
         this->_lcd->clear();
         // 温度と湿度
         dtostrf(temp, -1, 1, this->_temp);
         dtostrf(hum, -1, 1, this->_hum);
-        sprintf(this->_buf, "%s[C] %s[%%]", this->_temp, this->_hum);
+        sprintf_P(this->_buf, PSTR("%s[C] %s[%%]"), this->_temp, this->_hum);
         this->print_row(0, this->_buf);
         // 照度または土壌水分量
         if (this->_is_als) {
             dtostrf(als, -1, 0, this->_als);
-            sprintf(this->_buf, "ALS: %s[lx]", this->_als);
+            sprintf_P(this->_buf, PSTR("ALS: %s[lx]"), this->_als);
         } else {
             if (0 <= moist) {
-                sprintf(this->_moist, "%d", moist);
+                sprintf_P(this->_moist, PSTR("%d"), moist);
             } else {
-                strcpy(this->_moist, "Err.");
+                strcpy_P(this->_moist, PSTR("Err."));
             }
-            sprintf(this->_buf, "Soil moist: %s", this->_moist);
+            sprintf_P(this->_buf, PSTR("Soil moist: %s"), this->_moist);
         }
         this->print_row(1, this->_buf);
         // 切り替え
