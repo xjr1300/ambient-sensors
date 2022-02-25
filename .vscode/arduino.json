@@ -1,5 +1,5 @@
 {
-  "board": "arduino:avr:uno",
-  "port": "/dev/tty.usbmodem21401",
-  "sketch": "ambient-sensors.ino"
+    "board": "arduino:avr:uno",
+    "port": "/dev/tty.usbmodem21201",
+    "sketch": "ambient-sensors.ino"
 }
