@@ -32,7 +32,7 @@ LcdDisplay lcd_display;
 // LED
 #define LED_PIN 3
 #define MAX_LED_VALUE 100
-#define LED_DELAY 100
+#define LED_DELAY 300
 #define LED_STEP 10
 SwitchingLed led(LED_PIN, MAX_LED_VALUE, LED_STEP, LED_DELAY);
 #endif
