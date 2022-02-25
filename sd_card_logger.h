@@ -1,24 +1,25 @@
 #include "SdFat.h"
 
+#define SD_FAT_TYPE 3
 #define SPI_SPEED SD_SCK_MHZ(50)
 
 const int SD_CARD_CHIP_UNO = 10;
 const int SD_CARD_CHIP_MEGA = 53;
-const char* FILE_NAME = "measured_values.log";
-const char* ROTATED_NAME_FMT = "measured_values.log.%d";
+const char* FILE_NAME = "measured.csv";
+const char* ROTATED_NAME_FMT = "measured.csv.%d";
 
 class SDCardLogger {
    private:
     // SDカードのチップセレクト端子に接続するピン番号。
     SdCsPin_t _chip;
     // 1ファイルに出力するデータ数。
-    unsigned long _number_per_file;
+    uint32_t _number_per_file;
     // ファイルに出力したデータ数。
-    unsigned long _number_of_output;
+    uint32_t long _number_of_output;
     // ローテーションファイル数。
-    unsigned int _number_of_rotation;
+    uint8_t _number_of_rotation;
     // カレントファイル番号。
-    unsigned int _current_file_number;
+    uint8_t _current_file_number;
 
     // SDカード。
     SdFs _sd;
@@ -56,8 +57,8 @@ class SDCardLogger {
     //
     // Arguments:
     //  chip: SDカードのチップセレクト端子に接続するピン番号。
-    SDCardLogger(SdCsPin_t chip, unsigned long number_per_file,
-                 unsigned int number_of_rotation) {
+    SDCardLogger(SdCsPin_t chip, uint32_t number_per_file,
+                 uint16_t number_of_rotation) {
         this->_chip = chip;
         this->_number_per_file = number_per_file;
         this->_number_of_rotation = number_of_rotation;
@@ -78,17 +79,17 @@ class SDCardLogger {
     // Returns:
     //  測定値の書き込みに成功した場合はtrue。失敗した場合はfalse。
     bool write_measured_values(float temp, float hum, float als,
-                               int32_t moist) {
+                               int16_t moist) {
         dtostrf(temp, -1, 1, this->_temp);
         dtostrf(hum, -1, 1, this->_hum);
         dtostrf(als, -1, 0, this->_als);
         if (0 <= moist) {
-            sprintf(this->_moist, "%d", moist);
+            sprintf_P(this->_moist, PSTR("%d"), moist);
         } else {
-            strcpy(this->_moist, "Err.");
+            strcpy_P(this->_moist, PSTR("Err."));
         }
-        sprintf(this->_buf, "%s,%s,%s,%d", this->_temp, this->_hum, this->_als,
-                this->_moist);
+        sprintf_P(this->_buf, PSTR("%s,%s,%s,%d"), this->_temp, this->_hum,
+                  this->_als, this->_moist);
         if (this->_file.open(FILE_NAME, O_WRITE | O_CREAT | O_APPEND)) {
             this->_file.println(this->_buf);
             this->_file.close();
