@@ -8,7 +8,7 @@
 #define FILE_NAME "measured.csv"
 #define ROTATED_NAME_FMT "measured.csv.%d"
 
-class SDCardRollingLogger {
+class SDCardRotationLogger {
    private:
     // SDカードのチップセレクト端子に接続するピン番号。
     SdCsPin_t _chip;
@@ -32,7 +32,7 @@ class SDCardRollingLogger {
     char _rotated_fname[24];
 
     // デフォルトコンストラクタ
-    SDCardRollingLogger(void) {}
+    SDCardRotationLogger(void) {}
 
     // 測定値を書き込むファイルをローテーションする。
     bool rotate_file(void) {
@@ -57,8 +57,8 @@ class SDCardRollingLogger {
     //
     // Arguments:
     //  chip: SDカードのチップセレクト端子に接続するピン番号。
-    SDCardRollingLogger(SdCsPin_t chip, uint32_t number_per_file,
-                        uint16_t number_of_rotation) {
+    SDCardRotationLogger(SdCsPin_t chip, uint32_t number_per_file,
+                         uint16_t number_of_rotation) {
         this->_chip = chip;
         this->_number_per_file = number_per_file;
         this->_number_of_rotation = number_of_rotation;

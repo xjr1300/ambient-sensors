@@ -1,5 +1,5 @@
 #define __SWITCHING_LED__
-#define __SD_CARD_LOGGER__
+#define __SD_CARD_ROTATION_LOGGER__
 #define __SERIAL_MONITOR__
 
 #include <SPI.h>
@@ -12,8 +12,8 @@
 #include "switching_led.h"
 #endif
 #include "lcd_display.h"
-#ifdef __SD_CARD_LOGGER__
-#include "sd_card_logger.h"
+#ifdef __SD_CARD_ROTATION_LOGGER__
+#include "sd_card_rotation_logger.h"
 #endif
 #ifdef __SERIAL_MONITOR__
 #include "serial_monitor.h"
@@ -47,10 +47,10 @@ IlluminanceSensor ill_sensor;
 // 土壌水分センサー
 SoilMoistureSensor moist_sensor(10, 10);
 
-#ifdef __SD_CARD_LOGGER__
+#ifdef __SD_CARD_ROTATION_LOGGER__
 // SDカードロガー
 // 100万データ出力したらファイルをローテーション
-SDCardRollingLogger logger(SD_CARD_CHIP_UNO, 1000000, 10);
+SDCardRotationLogger logger(SD_CARD_CHIP_UNO, 1000000, 10);
 #endif
 
 void setup(void) {
@@ -82,7 +82,7 @@ void setup(void) {
         lcd_display.print_row(0, (const char*)F("Moist err."));
         return;
     }
-#ifdef __SD_CARD_LOGGER__
+#ifdef __SD_CARD_ROTATION_LOGGER__
     // SDカードロガーを初期化
     if (!logger.init()) {
         lcd_display.print_row(0, (const char*)F("Card err."));
@@ -112,7 +112,7 @@ void loop(void) {
     serial_monitor.print_measured_values(temp, hum, als, moist);
 #endif
     lcd_display.print_measured_values(temp, hum, als, moist);
-#ifdef __SD_CARD_LOGGER__
+#ifdef __SD_CARD_ROTATION_LOGGER__
     logger.write_measured_values(temp, hum, als, moist);
 #endif
 
