@@ -1,5 +1,5 @@
 #define __SWITCHING_LED__
-// #define __SD_CARD_LOGGER__
+#define __SD_CARD_LOGGER__
 #define __SERIAL_MONITOR__
 
 #include <SPI.h>
@@ -50,7 +50,7 @@ SoilMoistureSensor moist_sensor(10, 10);
 #ifdef __SD_CARD_LOGGER__
 // SDカードロガー
 // 100万データ出力したらファイルをローテーション
-SDCardLogger logger(SD_CARD_CHIP_UNO, 1000000, 10);
+SDCardRollingLogger logger(SD_CARD_CHIP_UNO, 1000000, 10);
 #endif
 
 void setup(void) {
@@ -74,25 +74,21 @@ void setup(void) {
     temp_hum_sensor.init();
     // 環境光照度センサーを初期化
     if (!ill_sensor.init()) {
-        lcd_display.print_row(0, "Ill err.");
+        lcd_display.print_row(0, (const char*)F("Ill err."));
         return;
     }
     // 土壌水分センサーを初期化
     if (!moist_sensor.init()) {
-        lcd_display.print_row(0, "Moist err.");
+        lcd_display.print_row(0, (const char*)F("Moist err."));
         return;
     }
 #ifdef __SD_CARD_LOGGER__
     // SDカードロガーを初期化
     if (!logger.init()) {
-        lcd_display.print_row(0, "Card err.");
+        lcd_display.print_row(0, (const char*)F("Card err."));
         return;
     }
 #endif
-
-    // 測定を開始
-    lcd_display.print_row(0, "Start...");
-    delay(1000);
 }
 
 void loop(void) {
