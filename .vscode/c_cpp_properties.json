@@ -40,7 +40,7 @@
                 "/Users/xjr1300/Documents/Arduino/libraries/RPR-0521RS",
                 "/Users/xjr1300/Documents/Arduino/libraries/SparkFun_Si7021_Humidity_and_Temperature_Sensor/src",
                 "/Applications/Arduino.app/Contents/Java/libraries/LiquidCrystal/src",
-                "/Users/xjr1300/Documents/Arduino/libraries/SdFat/src",
+                "/Applications/Arduino.app/Contents/Java/libraries/SD/src",
                 "/Applications/Arduino.app/Contents/Java/hardware/tools/avr/lib/gcc/avr/7.3.0/include",
                 "/Applications/Arduino.app/Contents/Java/hardware/tools/avr/lib/gcc/avr/7.3.0/include-fixed",
                 "/Applications/Arduino.app/Contents/Java/hardware/tools/avr/avr/include"
