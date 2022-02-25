@@ -5,7 +5,7 @@ class LcdDisplay {
     // LCDディスプレイポインタ
     LiquidCrystal* _lcd;
     // LCDに描画する文字列を作成するバッファ
-    char _buf[17], _temp[9], _hum[9], _als[17], _moist[17];
+    char _buf[17], _buf1[8], _buf2[8];
     // 環境光照度表示フラグ
     bool _is_als;
 
@@ -52,21 +52,21 @@ class LcdDisplay {
                                int16_t moist) {
         this->_lcd->clear();
         // 温度と湿度
-        dtostrf(temp, -1, 1, this->_temp);
-        dtostrf(hum, -1, 1, this->_hum);
-        sprintf_P(this->_buf, PSTR("%s[C] %s[%%]"), this->_temp, this->_hum);
+        dtostrf(temp, -1, 1, this->_buf1);
+        dtostrf(hum, -1, 1, this->_buf2);
+        sprintf_P(this->_buf, PSTR("%s[C] %s[%%]"), this->_buf1, this->_buf2);
         this->print_row(0, this->_buf);
         // 照度または土壌水分量
         if (this->_is_als) {
-            dtostrf(als, -1, 0, this->_als);
-            sprintf_P(this->_buf, PSTR("ALS: %s[lx]"), this->_als);
+            dtostrf(als, -1, 0, this->_buf1);
+            sprintf_P(this->_buf, PSTR("ALS: %s[lx]"), this->_buf1);
         } else {
             if (0 <= moist) {
-                sprintf_P(this->_moist, PSTR("%d"), moist);
+                sprintf_P(this->_buf1, PSTR("%d"), moist);
             } else {
-                strcpy_P(this->_moist, PSTR("Err."));
+                strcpy_P(this->_buf1, PSTR("Err."));
             }
-            sprintf_P(this->_buf, PSTR("Soil moist: %s"), this->_moist);
+            sprintf_P(this->_buf, PSTR("Moist: %s"), this->_buf1);
         }
         this->print_row(1, this->_buf);
         // 切り替え

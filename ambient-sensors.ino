@@ -1,5 +1,5 @@
 #define __SWITCHING_LED__
-// #define __SD_CARD_LOGGER__
+// #define __SD_CARD_ROTATION_LOGGER__
 #define __SERIAL_MONITOR__
 
 #include <SPI.h>
@@ -12,8 +12,10 @@
 #include "switching_led.h"
 #endif
 #include "lcd_display.h"
-#ifdef __SD_CARD_LOGGER__
-#include "sd_card_logger.h"
+#ifdef __SD_CARD_ROTATION_LOGGER__
+#include "sd_card_rotation_logger.h"
+#else
+#include "sd_card_simple_logger.h"
 #endif
 #ifdef __SERIAL_MONITOR__
 #include "serial_monitor.h"
@@ -32,9 +34,9 @@ LcdDisplay lcd_display;
 // LED
 #define LED_PIN 3
 #define MAX_LED_VALUE 100
-#define LED_DELAY 300
+#define LED_DELAY 200
 #define LED_STEP 10
-SwitchingLed led(LED_PIN, MAX_LED_VALUE, LED_STEP, LED_DELAY);
+SwitchingLed switching_led(LED_PIN, MAX_LED_VALUE, LED_STEP, LED_DELAY);
 #endif
 
 // 温湿度センサー
@@ -47,10 +49,10 @@ IlluminanceSensor ill_sensor;
 // 土壌水分センサー
 SoilMoistureSensor moist_sensor(10, 10);
 
-#ifdef __SD_CARD_LOGGER__
-// SDカードロガー
-// 100万データ出力したらファイルをローテーション
-SDCardLogger logger(SD_CARD_CHIP_UNO, 1000000, 10);
+#ifdef __SD_CARD_ROTATION_LOGGER__
+SDCardRotationLogger logger(10, 1000000, 10);
+#else
+SDCardSimpleLogger logger(10, 1000000);
 #endif
 
 void setup(void) {
@@ -68,31 +70,25 @@ void setup(void) {
     lcd_display.init(7, 8, 9, 4, 5, 6);
 #ifdef __SWITCHING_LED__
     // LEDをの初期化
-    led.init();
+    switching_led.init();
 #endif
     // 温湿度センサーを初期化
     temp_hum_sensor.init();
     // 環境光照度センサーを初期化
     if (!ill_sensor.init()) {
-        lcd_display.print_row(0, "Ill err.");
+        lcd_display.print_row(0, (const char*)F("Ill err."));
         return;
     }
     // 土壌水分センサーを初期化
     if (!moist_sensor.init()) {
-        lcd_display.print_row(0, "Moist err.");
+        lcd_display.print_row(0, (const char*)F("Moist err."));
         return;
     }
-#ifdef __SD_CARD_LOGGER__
     // SDカードロガーを初期化
     if (!logger.init()) {
-        lcd_display.print_row(0, "Card err.");
+        lcd_display.print_row(0, (const char*)F("Card err."));
         return;
     }
-#endif
-
-    // 測定を開始
-    lcd_display.print_row(0, "Start...");
-    delay(1000);
 }
 
 void loop(void) {
@@ -116,13 +112,11 @@ void loop(void) {
     serial_monitor.print_measured_values(temp, hum, als, moist);
 #endif
     lcd_display.print_measured_values(temp, hum, als, moist);
-#ifdef __SD_CARD_LOGGER__
     logger.write_measured_values(temp, hum, als, moist);
-#endif
 
 #ifdef __SWITCHING_LED__
     // LEDを点灯または消灯
-    led.on_off();
+    switching_led.on_off();
 #else
     delay(3000);
 #endif

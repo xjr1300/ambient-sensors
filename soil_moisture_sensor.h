@@ -1,12 +1,11 @@
 #include <Wire.h>
 
-const byte COMMAND_LED_OFF = 0x00;
-const byte COMMAND_LED_ON = 0x01;
-const byte COMMAND_GET_VALUE = 0x05;
-const byte COMMAND_NOTHING_NEW = 0x99;
-
 // センサーのデフォルトのI2Cアドレス
-const byte ADDRESS = 0x28;
+#define SOIL_MOISTURE_SENSOR_ADDRESS 0x28
+// 測定値送信命令
+#define SOIL_MOISTURE_SENSOR_COMMAND_SEND_VALUE 0x02
+// 測定値取得命令
+#define SOIL_MOISTURE_SENSOR_COMMAND_GET_VALUE 0x05
 
 /// Sparkfun Qwiic土壌水分センサー
 class SoilMoistureSensor {
@@ -35,7 +34,7 @@ class SoilMoistureSensor {
     //  センサーが接続されていることを確認できた場合はtrue。確認できなかった場合はfalse。
     bool init(void) {
         for (byte i = 0; i < this->_times; ++i) {
-            Wire.beginTransmission(ADDRESS);
+            Wire.beginTransmission(SOIL_MOISTURE_SENSOR_ADDRESS);
             if (Wire.endTransmission() == 0) {
                 return true;
             }
@@ -54,12 +53,13 @@ class SoilMoistureSensor {
     //  土壌水分量。マイナスの値が返却された場合は測定エラー。
     int16_t measure(void) {
         // 測定する命令を発効
-        Wire.beginTransmission(ADDRESS);
-        Wire.write(COMMAND_GET_VALUE);
+        Wire.beginTransmission(SOIL_MOISTURE_SENSOR_ADDRESS);
+        Wire.write(SOIL_MOISTURE_SENSOR_COMMAND_GET_VALUE);
         Wire.endTransmission();
 
         // 測定値を送信する命令を発効
-        Wire.requestFrom(ADDRESS, (uint8_t)0x02);
+        Wire.requestFrom(SOIL_MOISTURE_SENSOR_ADDRESS,
+                         SOIL_MOISTURE_SENSOR_COMMAND_SEND_VALUE);
 
         // 送信された測定値を読み込み
         for (byte i = 0; i < this->_times; ++i) {
