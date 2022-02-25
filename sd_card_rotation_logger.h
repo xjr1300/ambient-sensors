@@ -3,12 +3,10 @@
 #define SD_FAT_TYPE 3
 #define SPI_SPEED SD_SCK_MHZ(50)
 
-#define SD_CARD_CHIP_UNO 10
-#define SD_CARD_CHIP_MEGA 53
-#define FILE_NAME "measured.csv"
-#define ROTATED_NAME_FMT "measured.csv.%d"
+#define MEASURED_FILE_NAME "measured.csv"
+#define MEASURED_ROTATED_NAME_FMT "measured.csv.%d"
 
-class SDCardRollingLogger {
+class SDCardRotationLogger {
    private:
     // SDカードのチップセレクト端子に接続するピン番号。
     SdCsPin_t _chip;
@@ -32,12 +30,12 @@ class SDCardRollingLogger {
     char _rotated_fname[24];
 
     // デフォルトコンストラクタ
-    SDCardRollingLogger(void) {}
+    SDCardRotationLogger(void) {}
 
     // 測定値を書き込むファイルをローテーションする。
     bool rotate_file(void) {
         // 退避先のファイル名を生成
-        sprintf(this->_rotated_fname, ROTATED_NAME_FMT,
+        sprintf(this->_rotated_fname, MEASURED_ROTATED_NAME_FMT,
                 this->_current_file_number);
         // 退避先のファイルが存在する場合は削除
         if (this->_sd.exists(this->_rotated_fname)) {
@@ -49,7 +47,7 @@ class SDCardRollingLogger {
         ++this->_current_file_number;
         this->_current_file_number %= this->_number_of_rotation;
         // 測定値を記録したファイルを退避
-        return this->_sd.rename(FILE_NAME, this->_rotated_fname);
+        return this->_sd.rename(MEASURED_FILE_NAME, this->_rotated_fname);
     }
 
    public:
@@ -57,8 +55,8 @@ class SDCardRollingLogger {
     //
     // Arguments:
     //  chip: SDカードのチップセレクト端子に接続するピン番号。
-    SDCardRollingLogger(SdCsPin_t chip, uint32_t number_per_file,
-                        uint16_t number_of_rotation) {
+    SDCardRotationLogger(SdCsPin_t chip, uint32_t number_per_file,
+                         uint16_t number_of_rotation) {
         this->_chip = chip;
         this->_number_per_file = number_per_file;
         this->_number_of_rotation = number_of_rotation;
@@ -90,7 +88,8 @@ class SDCardRollingLogger {
         }
         sprintf_P(this->_buf, PSTR("%s,%s,%s,%d"), this->_temp, this->_hum,
                   this->_als, this->_moist);
-        if (this->_file.open(FILE_NAME, O_WRITE | O_CREAT | O_APPEND)) {
+        if (this->_file.open(MEASURED_FILE_NAME,
+                             O_WRITE | O_CREAT | O_APPEND)) {
             this->_file.println(this->_buf);
             this->_file.close();
         };
