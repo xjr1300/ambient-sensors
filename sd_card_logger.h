@@ -3,12 +3,12 @@
 #define SD_FAT_TYPE 3
 #define SPI_SPEED SD_SCK_MHZ(50)
 
-const int SD_CARD_CHIP_UNO = 10;
-const int SD_CARD_CHIP_MEGA = 53;
-const char* FILE_NAME = "measured.csv";
-const char* ROTATED_NAME_FMT = "measured.csv.%d";
+#define SD_CARD_CHIP_UNO 10
+#define SD_CARD_CHIP_MEGA 53
+#define FILE_NAME "measured.csv"
+#define ROTATED_NAME_FMT "measured.csv.%d"
 
-class SDCardLogger {
+class SDCardRollingLogger {
    private:
     // SDカードのチップセレクト端子に接続するピン番号。
     SdCsPin_t _chip;
@@ -32,7 +32,7 @@ class SDCardLogger {
     char _rotated_fname[24];
 
     // デフォルトコンストラクタ
-    SDCardLogger(void) {}
+    SDCardRollingLogger(void) {}
 
     // 測定値を書き込むファイルをローテーションする。
     bool rotate_file(void) {
@@ -57,8 +57,8 @@ class SDCardLogger {
     //
     // Arguments:
     //  chip: SDカードのチップセレクト端子に接続するピン番号。
-    SDCardLogger(SdCsPin_t chip, uint32_t number_per_file,
-                 uint16_t number_of_rotation) {
+    SDCardRollingLogger(SdCsPin_t chip, uint32_t number_per_file,
+                        uint16_t number_of_rotation) {
         this->_chip = chip;
         this->_number_per_file = number_per_file;
         this->_number_of_rotation = number_of_rotation;
