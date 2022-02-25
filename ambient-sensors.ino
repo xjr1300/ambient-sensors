@@ -1,19 +1,23 @@
-#define __SERIAL_MONITOR__
+#define __SWITCHING_LED__
 // #define __SD_CARD_LOGGER__
+#define __SERIAL_MONITOR__
+
 #include <SPI.h>
 #include <Wire.h>
 
 #include "illuminance_sensor.h"
+#include "soil_moisture_sensor.h"
+#include "temp_hum_sensor.h"
+#ifdef __SWITCHING_LED__
+#include "switching_led.h"
+#endif
 #include "lcd_display.h"
-#include "led.h"
 #ifdef __SD_CARD_LOGGER__
 #include "sd_card_logger.h"
 #endif
 #ifdef __SERIAL_MONITOR__
 #include "serial_monitor.h"
 #endif
-#include "soil_moisture_sensor.h"
-#include "temp_hum_sensor.h"
 
 #ifdef __SERIAL_MONITOR__
 // シリアルモニター
@@ -24,12 +28,14 @@ SerialMonitor serial_monitor(SERIAL_BOARATE);
 // LCDディスプレイ
 LcdDisplay lcd_display;
 
+#ifdef __SWITCHING_LED__
 // LED
 #define LED_PIN 3
-#define MAX_LED_VALUE 80
-#define LED_DELAY 200
-#define LED_STEP 8
+#define MAX_LED_VALUE 100
+#define LED_DELAY 300
+#define LED_STEP 10
 SwitchingLed led(LED_PIN, MAX_LED_VALUE, LED_STEP, LED_DELAY);
+#endif
 
 // 温湿度センサー
 #define SI7021_ADDRESS 0x40
@@ -60,8 +66,10 @@ void setup(void) {
     // lcd_displayディスプレイを初期化
     // lcd_display.init(7, 8, 9, 10, 11, 12);
     lcd_display.init(7, 8, 9, 4, 5, 6);
+#ifdef __SWITCHING_LED__
     // LEDをの初期化
     led.init();
+#endif
     // 温湿度センサーを初期化
     temp_hum_sensor.init();
     // 環境光照度センサーを初期化
@@ -112,6 +120,10 @@ void loop(void) {
     logger.write_measured_values(temp, hum, als, moist);
 #endif
 
+#ifdef __SWITCHING_LED__
     // LEDを点灯または消灯
     led.on_off();
+#else
+    delay(3000);
+#endif
 }
