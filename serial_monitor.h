@@ -3,7 +3,7 @@ class SerialMonitor {
     // ボーレート
     int _boarate;
     // シリアルモニタに測定値を表示するときに使用するバッファ
-    char _serial[128], _temp[16], _hum[16], _als[32], _moist[32];
+    char _serial[64], _temp[8], _hum[8], _als[8], _moist[8];
 
     // デフォルトコンストラクタ。
     SerialMonitor(void) {}
@@ -22,7 +22,6 @@ class SerialMonitor {
         while (!Serial) {
             // Do not anything.
         }
-        Serial.println(F("[INFO] Serial was initialized."));
     }
 
     // 測定値をシリアルモニタに出力する。
