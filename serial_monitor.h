@@ -22,7 +22,7 @@ class SerialMonitor {
         while (!Serial) {
             // Do not anything.
         }
-        Serial.println("[INFO] Serial monitor was initialized.");
+        Serial.println(F("[INFO] Serial was initialized."));
     }
 
     // 測定値をシリアルモニタに出力する。
@@ -33,18 +33,18 @@ class SerialMonitor {
     //  als: 環境光照度。
     //  moist: 土壌水分量。
     void print_measured_values(float temp, float hum, float als,
-                               int32_t moist) {
+                               int16_t moist) {
         dtostrf(temp, -1, 1, this->_temp);
         dtostrf(hum, -1, 1, this->_hum);
         dtostrf(als, -1, 0, this->_als);
         if (0 <= moist) {
-            sprintf(this->_moist, "%d", moist);
+            sprintf_P(this->_moist, PSTR("%d"), moist);
         } else {
-            strcpy(this->_moist, "Err.");
+            strcpy_P(this->_moist, PSTR("Err."));
         }
-        sprintf(this->_serial,
-                "Temp: %s[C], Hum: %s[%%], ALS: %s[lx], Moist: %d", this->_temp,
-                this->_hum, this->_als, this->_moist);
+        sprintf_P(this->_serial,
+                  PSTR("Temp: %s[C], Hum: %s[%%], ALS: %s[lx], Moist: %d"),
+                  this->_temp, this->_hum, this->_als, this->_moist);
         Serial.println(_serial);
     }
 };
