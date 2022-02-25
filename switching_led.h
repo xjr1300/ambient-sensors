@@ -3,9 +3,9 @@ class SwitchingLed {
     // ピン番号。
     byte _pin;
     // LEDを点灯するときの最大値。
-    byte _max_value;
+    short _max_value;
     // LEDを点灯または消灯するときのステップ値。
-    byte _step;
+    short _step;
     // LEDを点灯または消灯するときの遅延時間(ミリ秒)。
     uint16_t _delay;
     // LED電圧増加フラグ。
@@ -20,7 +20,7 @@ class SwitchingLed {
     //  start_value: 初期値。
     //  end_value: 終了値。
     //  step: ステップ値。
-    void switching_values(byte* start_value, byte* end_value, byte* step) {
+    void switching_values(short* start_value, short* end_value, short* step) {
         if (this->_increase) {
             *start_value = 0;
             *end_value = this->_max_value;
@@ -32,7 +32,7 @@ class SwitchingLed {
         }
     }
 
-    bool is_break_loop(byte current_value, byte end_value) {
+    bool is_break_loop(short current_value, short end_value) {
         if (this->_increase && end_value < current_value) {
             return true;
         } else if (!this->_increase && current_value < end_value) {
@@ -49,7 +49,7 @@ class SwitchingLed {
     //  max_value: LEDを点灯するときの最大値。
     //  step: LEDを点灯または消灯するときのステップ数。
     //  delay: LEDを点灯または消灯するときの遅延時間(ミリ秒)。
-    SwitchingLed(byte pin, byte max_value, byte step, uint16_t delay) {
+    SwitchingLed(byte pin, short max_value, short step, uint16_t delay) {
         this->_pin = pin;
         this->_max_value = max_value;
         this->_step = step;
@@ -65,7 +65,8 @@ class SwitchingLed {
 
     /// 点灯または消灯する。
     void on_off(void) {
-        byte current_value, end_value, step;
+        short current_value, end_value;
+        short step;
         this->switching_values(&current_value, &end_value, &step);
         while (!this->is_break_loop(current_value, end_value)) {
             analogWrite(this->_pin, current_value);
