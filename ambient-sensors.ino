@@ -28,7 +28,7 @@ SerialMonitor serial_monitor(SERIAL_BOARATE);
 #endif
 
 // LCDディスプレイ
-LcdDisplay lcd_display;
+LcdDisplay lcd_display(7, 8, 9, 4, 5, 6);
 
 #ifdef __SWITCHING_LED__
 // LED
@@ -65,9 +65,6 @@ void setup(void) {
     // シリアルモニタを初期化
     serial_monitor.init();
 #endif
-    // lcd_displayディスプレイを初期化
-    // lcd_display.init(7, 8, 9, 10, 11, 12);
-    lcd_display.init(7, 8, 9, 4, 5, 6);
 #ifdef __SWITCHING_LED__
     // LEDをの初期化
     switching_led.init();
