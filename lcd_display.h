@@ -2,6 +2,8 @@
 
 class LcdDisplay {
    private:
+    // デフォルトコンストラクタ
+    LcdDisplay(void) {}
     // LCDディスプレイポインタ
     LiquidCrystal* _lcd;
     // LCDに描画する文字列を作成するバッファ
@@ -10,14 +12,7 @@ class LcdDisplay {
     bool _is_als;
 
    public:
-    // デフォルトコンストラクタ
-    //
-    LcdDisplay(void) { this->_is_als = true; }
-
-    // デストラクタ
-    ~LcdDisplay(void) { delete this->_lcd; }
-
-    // 初期化する。
+    // コンストラクタ
     // Arguments:
     //  rs: LCDのRSピンに接続するArduino側のピン番号。
     //  enable: LCDのenableピンに接続するArduino側のピン番号。
@@ -25,11 +20,15 @@ class LcdDisplay {
     //  d5: LCDのD5ピンに接続するArduino側のピン番号
     //  d6: LCDのD6ピンに接続するArduino側のピン番号
     //  d7: LCDのD7ピンに接続するArduino側のピン番号
-    void init(byte rs, byte enable, byte d4, byte d5, byte d6, byte d7) {
+    LcdDisplay(byte rs, byte enable, byte d4, byte d5, byte d6, byte d7) {
         this->_lcd = new LiquidCrystal(rs, enable, d4, d5, d6, d7);
         this->_lcd->begin(16, 2);
         this->_lcd->clear();
+        this->_is_als = true;
     }
+
+    // デストラクタ
+    ~LcdDisplay(void) { delete this->_lcd; }
 
     // LCDディスプレイの指定した行に文字列を表示する。
     //
